@@ -27,8 +27,9 @@ extension KeyboardShortcuts {
 	```
 	*/
 	public final class RecorderCocoa: NSSearchField, NSSearchFieldDelegate {
-		private let minimumWidth = 130.0
+		private let minimumWidth = 150.0
 		private let onChange: ((_ shortcut: Shortcut?) -> Void)?
+		private let onEndEditing: ((_ isShortcutEmpty: Bool) -> Void)?
 		private var canBecomeKey = false
 		private var eventMonitor: LocalEventMonitor?
 		private var shortcutsNameChangeObserver: NSObjectProtocol?
@@ -83,10 +84,12 @@ extension KeyboardShortcuts {
 		*/
 		public required init(
 			for name: Name,
-			onChange: ((_ shortcut: Shortcut?) -> Void)? = nil
+			onChange: ((_ shortcut: Shortcut?) -> Void)? = nil,
+			onEndEditing: ((_ isShortcutEmpty: Bool) -> Void)? = nil
 		) {
 			self.shortcutName = name
 			self.onChange = onChange
+			self.onEndEditing = onEndEditing
 
 			super.init(frame: .zero)
 			self.delegate = self
@@ -167,6 +170,7 @@ extension KeyboardShortcuts {
 		/// :nodoc:
 		public func controlTextDidEndEditing(_ object: Notification) {
 			endRecording()
+			onEndEditing?(stringValue.isEmpty)
 		}
 
 		/// :nodoc:
